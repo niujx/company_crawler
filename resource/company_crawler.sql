@@ -11,5 +11,5 @@ create table company_crawler(
   ext_info TEXT,
   crawler_url VARCHAR(64),
   create_time TimeStamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  crawler_Spider varchar(64)
+  crawler_spider varchar(64)
 );

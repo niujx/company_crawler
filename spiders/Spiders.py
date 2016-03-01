@@ -42,4 +42,5 @@ class Lagou(scrapy.Spider):
         lagou_loader.add_xpath('company_url', '//div[@class="company_main"]/h1/a/@href')
         lagou_loader.add_xpath('ext_info', '//div[@id="history_container"]/div[@class="item_content"]//text()')
         lagou_loader.add_value('crawler_url', response.url)
+        lagou_loader.add_value('crawler_spider', 'lagou')
         return lagou_loader.load_item()

@@ -48,3 +48,4 @@ class LagouItem(scrapy.Item):
         input_processor=MapCompose(parse_field),
         output_processor=Join(),
     )
+    crawler_spider = scrapy.Field()
