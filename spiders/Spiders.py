@@ -33,7 +33,7 @@ class Lagou(scrapy.Spider):
 
         lagou_loader = ItemLoader(item=LagouItem(), response=response)
         lagou_loader.add_xpath('company_name', '//div[@class="company_main"]/h1/a/@title')
-        lagou_loader.add_xpath('product_name', '//div[@class="product_url"]/a[@class="url_valid"]/text()')
+        lagou_loader.add_xpath('product_name', '//div[@id="company_products"]/div[@class="item_content"]//text()')
         lagou_loader.add_xpath('trade', '//div[@class="item_content"]/ul/li[1]/span/text()')
         lagou_loader.add_xpath('location', '//div[@class="item_content"]/ul/li[4]/span/text()')
         lagou_loader.add_xpath('stage', '//div[@class="item_content"]/ul/li[2]/span/text()')
