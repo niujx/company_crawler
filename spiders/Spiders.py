@@ -15,7 +15,7 @@ class Lagou(scrapy.Spider):
     ]
 
     def start_requests(self):
-        for i in xrange(1, 20):
+        for i in xrange(1, 2):
             url = 'http://www.lagou.com/gongsi/2-0-0.json?first=false&havemark=0&pn=' + str(i) + '&sortField=0'
             yield self.make_requests_from_url(url)
 
@@ -31,6 +31,15 @@ class Lagou(scrapy.Spider):
         if not response.status == 200:
             return
 
-        lagou_pipline = ItemLoader(item=LagouItem(), response=response)
-        lagou_pipline.add_xpath('company_name', '/html/body/div[3]/div/div/div[1]/h1/a')
-        return lagou_pipline.load_item()
+        lagou_loader = ItemLoader(item=LagouItem(), response=response)
+        lagou_loader.add_xpath('company_name', '//div[@class="company_main"]/h1/a/@title')
+        lagou_loader.add_xpath('product_name', '//div[@class="product_url"]/a[@class="url_valid"]/text()')
+        lagou_loader.add_xpath('trade', '//div[@class="item_content"]/ul/li[1]/span/text()')
+        lagou_loader.add_xpath('location', '//div[@class="item_content"]/ul/li[4]/span/text()')
+        lagou_loader.add_xpath('stage', '//div[@class="item_content"]/ul/li[2]/span/text()')
+        lagou_loader.add_xpath('management_team', '//ul[@class="manager_list"]/li//text()')
+        lagou_loader.add_xpath('introduction', '//span[@class="company_content"]//text()')
+        lagou_loader.add_xpath('company_url', '//div[@class="company_main"]/h1/a/@href')
+        lagou_loader.add_xpath('ext_info', '//div[@id="history_container"]/div[@class="item_content"]//text()')
+        lagou_loader.add_value('crawler_url', response.url)
+        return lagou_loader.load_item()
