@@ -12,7 +12,7 @@ class export_to_excel(object):
         for head in heads[crawler]:
             ws.write(0, i, head)
             i += 1
-            
+
         sio = StringIO.StringIO()
         wb.save(sio)
         return sio.getvalue()
