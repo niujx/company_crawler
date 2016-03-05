@@ -1,5 +1,6 @@
 create table company_crawler(
-  id int PRIMARY KEY     NOT NULL,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  company_id varchar(64),
   company_name VARCHAR(64),
   product_name TEXT,
   trade VARCHAR(64),

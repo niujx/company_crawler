@@ -8,6 +8,9 @@ def parse_field(text):
 
 
 class LagouItem(scrapy.Item):
+    company_id = scrapy.Field(
+        output_processor=Join()
+    )
     company_name = scrapy.Field(
         input_processor=MapCompose(parse_field),
         output_processor=Join(),
@@ -48,4 +51,6 @@ class LagouItem(scrapy.Item):
         input_processor=MapCompose(parse_field),
         output_processor=Join(),
     )
-    crawler_spider = scrapy.Field()
+    crawler_spider = scrapy.Field(
+                output_processor=Join()
+    )
