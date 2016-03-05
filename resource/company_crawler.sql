@@ -14,3 +14,11 @@ create table company_crawler(
   create_time TimeStamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   crawler_spider varchar(64)
 );
+
+
+create table crawler_task(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    crawler_spider VARCHAR(64),
+    create_time TimeStamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    state varchar(1)
+)
