@@ -2,7 +2,8 @@ scrapy
 sqlite3
 flask
 twisted
-xlrdee
+xlrde
+apscheduler
 
 
 1）公司名称：
