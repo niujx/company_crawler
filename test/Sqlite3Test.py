@@ -1,12 +1,4 @@
-import sqlite3
+from db.databases import Sqlite3DB
 
-connection = sqlite3.connect('../resource/test.db')
-cur = connection.cursor()
-cur.execute('INSERT INTO foo (o_id, fruit, veges) VALUES(NULL, "apple", "broccoli")')
-connection.commit()
-print cur.lastrowid
-cur.execute('SELECT * FROM foo')
-print cur.fetchall()
-
-
-
+for i in xrange(0,100):
+    Sqlite3DB().create_crawler_task('lagou')

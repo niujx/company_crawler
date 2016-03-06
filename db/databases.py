@@ -31,7 +31,7 @@ class Sqlite3DB(object):
         cursor.close()
         return exists
 
-    def create_crawler_test(self, crawler_spider):
+    def create_crawler_task(self, crawler_spider):
         sql = "insert into crawler_task (crawler_spider,create_time,state) " \
               "values ('%s',DATETIME('NOW'),'1')" % (crawler_spider)
         cursor = self.connection.cursor()
@@ -39,9 +39,9 @@ class Sqlite3DB(object):
         self.connection.commit()
         cursor.close()
 
-    def update_task_state(self, crawler_spider, today):
+    def update_task_state(self, crawler_spider):
         sql = "update crawler_task set state= '2' where crawler_spider='%s' and date(create_time) ='%s'" % (
-            crawler_spider, today)
+            crawler_spider, str(date.today()))
         cursor = self.connection.cursor()
         cursor.execute(sql)
         self.connection.commit()
@@ -56,7 +56,7 @@ class Sqlite3DB(object):
         return infos
 
     def find_task_by_limit(self, limit):
-        sql = "select id,crawler_spider,date(create_time) as today ,state from crawler_task limit %s,%s" % (limit, 20)
+        sql = "select id,crawler_spider,date(create_time) as today ,state from crawler_task order by id desc limit %s,%s" % (limit, 20)
         cursor = self.connection.cursor()
         cursor.execute(sql)
         tasks = []

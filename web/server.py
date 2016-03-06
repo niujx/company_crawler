@@ -4,17 +4,14 @@ from flask import request
 from apscheduler.schedulers.background import BackgroundScheduler
 from export import export_to_excel
 from db.databases import Sqlite3DB
+from run import start_crawler
 
 app = Flask(__name__)
 
 
-def test():
-    print 'test...'
-
-
 def job():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(test, 'cron', second='*/3', hour='*')
+    scheduler.add_job(start_crawler, 'cron', hour='1')
     try:
         scheduler.start()
     except:

@@ -23,8 +23,8 @@ class Lagou(scrapy.Spider):
     sqlite3 = Sqlite3DB()
 
     def start_requests(self):
-        self.sqlite3.create_crawler_test('lagou')
-        for i in xrange(1, 2):
+        #self.sqlite3.create_crawler_task('lagou')
+        for i in xrange(1, 21):
             url = 'http://www.lagou.com/gongsi/2-0-0.json?first=false&havemark=0&pn=' + str(i) + '&sortField=0'
             yield self.make_requests_from_url(url)
 
