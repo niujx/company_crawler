@@ -62,3 +62,8 @@ DOWNLOAD_DELAY = 0.5
 HTTPERROR_ALLOWED_CODES = [404]
 
 CONCURRENT_REQUESTS_PER_DOMAIN = 3
+
+loginBy36kr = {
+    'username': 'qianglin@k2vc.com',
+    'password': '0322zhang'
+}
