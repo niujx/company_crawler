@@ -69,3 +69,6 @@ class Sqlite3DB(object):
             tasks.append(task)
         cursor.close()
         return tasks
+
+if __name__ == '__main__':
+    print  os.environ

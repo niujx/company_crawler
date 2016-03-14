@@ -65,6 +65,9 @@ class N36kr(scrapy.Spider):
     name = '36kr'
     allowed_domains = ['36kr.com']
     start_urls = []
+    introductions = ['competitor', 'dataLights', 'projectAdvantage', 'projectPlan', 'scale']
+    addresses = ['address1', 'address2', 'address3']
+    companys = ['intro', 'story']
     headers = {
         'Accept': 'application/json, text/plain, */*',
         'Accept-Encoding': 'gzip, deflate, br',
@@ -85,9 +88,36 @@ class N36kr(scrapy.Spider):
         print 'start cookie'
         browser.close()
         for i in xrange(1, 21):
-            yield scrapy.Request(url='https://rong.36kr.com/api/company?fincestatus=1&page='+str(i)+'&type=0',
+            yield scrapy.Request(url='https://rong.36kr.com/api/company?fincestatus=1&page=' + str(i) + '&type=0',
                                  cookies=browser.get_cookies(), callback=self.parse)
 
     def parse(self, response):
+        if not response.status == 200:
+            return
         datas = json.loads(response.body, encoding='utf-8')
-        print datas['data']['page']['page']
+        for all_info in datas['data']['page']['data']:
+            company = all_info['company']
+            financing = all_info['financing']
+            founder = all_info['founder']
+            kr36_loader = ItemLoader(item=LagouItem(), response=response)
+            kr36_loader.add_value('company_id', str(company['id']))
+            kr36_loader.add_value('company_name', company['fullName'])
+            kr36_loader.add_value('product_name', company['name'])
+            kr36_loader.add_value('trade', company['industry'])
+            kr36_loader.add_value('location', self.get_text(self.addresses, company))
+            kr36_loader.add_value('stage', financing['phase'])
+            kr36_loader.add_value('management_team', "".join([str(f['name']).strip() for f in founder if f['name']]))
+            kr36_loader.add_value('introduction', self.get_text(self.companys, company))
+            if company.has_key('website'):
+                kr36_loader.add_value('company_url', company['website'])
+            kr36_loader.add_value('ext_info', self.get_text(self.introductions, financing))
+            kr36_loader.add_value('crawler_url', 'https://rong.36kr.com/company/%s/overview' % company['id'])
+            kr36_loader.add_value('crawler_spider', '36kr')
+            yield kr36_loader.load_item()
+
+    def get_text(self, keys, info):
+        result = []
+        for key in keys:
+            if info.has_key(key):
+                result.append(str(info[key]))
+        return "|".join(result) if len(result) > 0 else ''
