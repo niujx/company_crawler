@@ -61,6 +61,26 @@ class Lagou(scrapy.Spider):
         return lagou_loader.load_item()
 
 
+industry_mapping = {
+    'CONSUMER_LIFESTYLE': u'消费生活',
+    'E_COMMERCE': u'电子商务',
+    'SOCIAL_NETWORK': u'社交网络',
+    'INTELLIGENT_HARDWARE': u'智能硬件',
+    'MEDIA': u'媒体门户',
+    'SOFTWARE': u'工具软件',
+    'FINANCE': u'金融',
+    'MEDICAL_HEALTH': u'医疗健康',
+    'SERVICE_INDUSTRIES': u'企业服务',
+    'TRAVEL_OUTDOORS': u'旅游户外',
+    'PROPERTY_AND_HOME_FURNISHINGS': u'房产家居',
+    'CULTURE_SPORTS_ART': u'数字娱乐',
+    'EDUCATION_TRAINING': u'在线教育',
+    'AUTO': u'汽车交通 ',
+    'OTHER': u' 其他 ',
+    'LOGISTICS': u'物流',
+}
+
+
 class N36kr(scrapy.Spider):
     name = '36kr'
     allowed_domains = ['36kr.com']
@@ -103,7 +123,7 @@ class N36kr(scrapy.Spider):
             kr36_loader.add_value('company_id', str(company['id']))
             kr36_loader.add_value('company_name', company['fullName'])
             kr36_loader.add_value('product_name', company['name'])
-            kr36_loader.add_value('trade', company['industry'])
+            kr36_loader.add_value('trade', industry_mapping[company['industry']])
             kr36_loader.add_value('location', self.get_text(self.addresses, company))
             kr36_loader.add_value('stage', financing['phase'])
             kr36_loader.add_value('management_team', "".join([str(f['name']).strip() for f in founder if f['name']]))
