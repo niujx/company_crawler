@@ -22,3 +22,11 @@ create table crawler_task(
     create_time TimeStamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     state varchar(1)
 )
+
+create table kr36_citys(
+   id INTEGER PRIMARY KEY ,
+   parentId INTEGER,
+   dispOrder INTEGER,
+   name varchar(64),
+   feature INTEGER
+)

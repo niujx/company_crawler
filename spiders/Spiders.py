@@ -80,7 +80,6 @@ industry_mapping = {
     'LOGISTICS': u'物流',
 }
 
-
 class N36kr(scrapy.Spider):
     name = '36kr'
     allowed_domains = ['36kr.com']
@@ -88,6 +87,7 @@ class N36kr(scrapy.Spider):
     introductions = ['competitor', 'dataLights', 'projectAdvantage', 'projectPlan', 'scale']
     addresses = ['address1', 'address2', 'address3']
     companys = ['intro', 'story']
+    city_dict = {}
     headers = {
         'Accept': 'application/json, text/plain, */*',
         'Accept-Encoding': 'gzip, deflate, br',
@@ -98,6 +98,7 @@ class N36kr(scrapy.Spider):
     }
 
     def start_requests(self):
+        self._load_city_dict()
         browser = webdriver.Firefox()
         browser.get('http://36kr.com/')
         browser.find_element_by_link_text('登录/注册').click()
@@ -124,20 +125,35 @@ class N36kr(scrapy.Spider):
             kr36_loader.add_value('company_name', company['fullName'])
             kr36_loader.add_value('product_name', company['name'])
             kr36_loader.add_value('trade', industry_mapping[company['industry']])
-            kr36_loader.add_value('location', self.get_text(self.addresses, company))
+            kr36_loader.add_value('location', self._get_address_test(self.addresses, company))
             kr36_loader.add_value('stage', financing['phase'])
             kr36_loader.add_value('management_team', "".join([str(f['name']).strip() for f in founder if f['name']]))
-            kr36_loader.add_value('introduction', self.get_text(self.companys, company))
+            kr36_loader.add_value('introduction', self._get_text(self.companys, company))
             if company.has_key('website'):
                 kr36_loader.add_value('company_url', company['website'])
-            kr36_loader.add_value('ext_info', self.get_text(self.introductions, financing))
+            kr36_loader.add_value('ext_info', self._get_text(self.introductions, financing))
             kr36_loader.add_value('crawler_url', 'https://rong.36kr.com/company/%s/overview' % company['id'])
             kr36_loader.add_value('crawler_spider', '36kr')
             yield kr36_loader.load_item()
 
-    def get_text(self, keys, info):
+    def _get_text(self, keys, info):
         result = []
         for key in keys:
             if info.has_key(key):
                 result.append(str(info[key]))
         return "|".join(result) if len(result) > 0 else ''
+
+    def _get_address_test(self, keys, info):
+        result = []
+        for key in keys:
+            if info.has_key(key):
+                city_info = self.city_dict[info[key]]
+                result.append(city_info['name'])
+        return "|".join(result) if len(result) > 0 else ''
+
+    def _load_city_dict(self):
+        import os
+        with open(os.environ['PYTHONPATH'] + '/resource/36kr_city.json', 'r') as f:
+            city_data = json.load(f, encoding='utf8')
+        for city in city_data:
+            self.city_dict[city['id']] = city
