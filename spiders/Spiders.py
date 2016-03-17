@@ -5,7 +5,7 @@ import scrapy
 # 拉勾网的爬虫
 from scrapy.loader import ItemLoader
 from items import LagouItem
-import settings
+import os
 import re
 from db.databases import Sqlite3DB
 from selenium import webdriver
@@ -88,6 +88,7 @@ class N36kr(scrapy.Spider):
     addresses = ['address1', 'address2', 'address3']
     companys = ['intro', 'story']
     city_dict = {}
+    a_b_c_dict = {}
     headers = {
         'Accept': 'application/json, text/plain, */*',
         'Accept-Encoding': 'gzip, deflate, br',
@@ -126,7 +127,7 @@ class N36kr(scrapy.Spider):
             kr36_loader.add_value('product_name', company['name'])
             kr36_loader.add_value('trade', industry_mapping[company['industry']])
             kr36_loader.add_value('location', self._get_address_test(self.addresses, company))
-            kr36_loader.add_value('stage', financing['phase'])
+            kr36_loader.add_value('stage', self.a_b_c_dict[financing['phase']])
             kr36_loader.add_value('management_team', "".join([str(f['name']).strip() for f in founder if f['name']]))
             kr36_loader.add_value('introduction', self._get_text(self.companys, company))
             if company.has_key('website'):
@@ -152,8 +153,17 @@ class N36kr(scrapy.Spider):
         return "|".join(result) if len(result) > 0 else ''
 
     def _load_city_dict(self):
-        import os
         with open(os.environ['PYTHONPATH'] + '/resource/36kr_city.json', 'r') as f:
             city_data = json.load(f, encoding='utf8')
         for city in city_data:
             self.city_dict[city['id']] = city
+
+    def _a_b_c_dict(self):
+        with open(os.environ['PYTHONPATH'] + '/resource/a_b_c.json','r') as f:
+            a_b_c_data  = json.load(f,encoding='utf8')
+
+        for abc in a_b_c_data:
+            self.a_b_c_dict[abc['value']] = abc['desc']
+
+
+
