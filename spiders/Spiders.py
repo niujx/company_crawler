@@ -80,6 +80,7 @@ industry_mapping = {
     'LOGISTICS': u'物流',
 }
 
+
 class N36kr(scrapy.Spider):
     name = '36kr'
     allowed_domains = ['36kr.com']
@@ -100,6 +101,7 @@ class N36kr(scrapy.Spider):
 
     def start_requests(self):
         self._load_city_dict()
+        self._a_b_c_dict()
         browser = webdriver.Firefox()
         browser.get('http://36kr.com/')
         browser.find_element_by_link_text('登录/注册').click()
@@ -148,8 +150,12 @@ class N36kr(scrapy.Spider):
         result = []
         for key in keys:
             if info.has_key(key):
-                city_info = self.city_dict[info[key]]
-                result.append(city_info['name'])
+                try:
+                    city_info = self.city_dict[int(info[key])]
+                    result.append(city_info['name'])
+                except:
+                    print 'error', info
+
         return "|".join(result) if len(result) > 0 else ''
 
     def _load_city_dict(self):
@@ -159,11 +165,8 @@ class N36kr(scrapy.Spider):
             self.city_dict[city['id']] = city
 
     def _a_b_c_dict(self):
-        with open(os.environ['PYTHONPATH'] + '/resource/a_b_c.json','r') as f:
-            a_b_c_data  = json.load(f,encoding='utf8')
+        with open(os.environ['PYTHONPATH'] + '/resource/a_b_c.json', 'r') as f:
+            a_b_c_data = json.load(f, encoding='utf8')
 
         for abc in a_b_c_data:
             self.a_b_c_dict[abc['value']] = abc['desc']
-
-
-

@@ -10,5 +10,5 @@ for data in datas:
     city_dicts[data['id']] = data
 
 print len(city_dicts)
-for (key, city) in city_dicts.items():
-    print key, city
+print city_dicts[90112]
+
