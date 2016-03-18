@@ -176,14 +176,15 @@ class ITjuzi(scrapy.Spider):
     name = 'itjuzi'
     start_urls = []
     allowed_domains = ['itjuzi.com']
+    heades = {'Referer': 'http://itjuzi.com/company?sortby=foundtime',
+              'Origin': 'http://itjuzi.com',
+              'Connection': 'keep-alive',
+              'Accept-Encoding': 'gzip, deflate, br',
+              'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0'}
 
     def start_requests(self):
         yield scrapy.Request("http://itjuzi.com/company?sortby=foundtime&page=2",
-                             headers={'Referer': 'http://itjuzi.com/company?sortby=foundtime',
-                                      'Origin': 'http://itjuzi.com',
-                                      'Connection': 'keep-alive',
-                                      'Accept-Encoding': 'gzip, deflate, br',
-                                      'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0'},
+                             headers=self.heades,
                              callback=self._request_generator)
 
     def _request_generator(self, response):
