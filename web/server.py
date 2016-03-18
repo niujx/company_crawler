@@ -50,3 +50,4 @@ def download(crawler, today):
 if __name__ == '__main__':
     job()
     app.run(host='0.0.0.0', port=8964, debug=True)
+

@@ -170,3 +170,25 @@ class N36kr(scrapy.Spider):
 
         for abc in a_b_c_data:
             self.a_b_c_dict[abc['value']] = abc['desc']
+
+
+class ITjuzi(scrapy.Spider):
+    name = 'itjuzi'
+    start_urls = []
+    allowed_domains = ['itjuzi.com']
+
+    def start_requests(self):
+        yield scrapy.Request("http://itjuzi.com/company?sortby=foundtime&page=2",
+                             headers={'Referer': 'http://itjuzi.com/company?sortby=foundtime',
+                                      'Origin': 'http://itjuzi.com',
+                                      'Connection': 'keep-alive',
+                                      'Accept-Encoding': 'gzip, deflate, br',
+                                      'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0'},
+                             callback=self._request_generator)
+
+    def _request_generator(self, response):
+        # <a data-ci-pagination-page="2378" href="http://itjuzi.com/company?sortby=foundtime&amp;page=2378">尾页 »</a>
+        print response.body
+
+    def parse(self, response):
+        pass
