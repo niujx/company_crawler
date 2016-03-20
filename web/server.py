@@ -5,6 +5,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from export import export_to_excel
 from db.databases import Sqlite3DB
 from run import start_crawler
+from scrapy.crawler import CrawlerProcess
+from scrapy.utils.project import get_project_settings
+from spiders.Spiders import Lagou, N36kr, ITjuzi
+import threading
+import thread
 
 app = Flask(__name__)
 
@@ -38,6 +43,32 @@ def index():
                            next=int(page) + 20)
 
 
+@app.route('/start_crawler')
+def start_crawler():
+    crawler = request.args.get('crawler')
+    CrawlerRun(crawler).start()
+    return index()
+
+
+class CrawlerRun(threading.Thread):
+    def __init__(self, crawler):
+        threading.Thread.__init__(self)
+        self.crawler = crawler
+
+    def run(self):
+        print 'start crawler', self.crawler
+        process = CrawlerProcess(get_project_settings())
+        process.crawl(crawlers[self.crawler])
+        process.start()
+
+
+crawlers = {
+    'lagou': Lagou,
+    '36kr': N36kr,
+    'itjuzi': ITjuzi
+}
+
+
 @app.route('/download/<crawler>/<today>', methods=['GET', 'POST'])
 def download(crawler, today):
     print crawler, today
@@ -50,4 +81,3 @@ def download(crawler, today):
 if __name__ == '__main__':
     job()
     app.run(host='0.0.0.0', port=8964, debug=True)
-

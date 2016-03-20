@@ -61,6 +61,9 @@ heads = {'lagou': [
 ], '36kr': [
     u'公司名称', u'产品名称', u'项目简介', u'行业1', u'行业2', u'爬取的URL', u'阶段和投资信息', u'管理团队1', u'职位1', u'管理团队',
     u'所在地', u'公司网址', u'扩展信息'
+], 'itjuzi': [
+    u'公司名称', u'产品名称', u'项目简介', u'行业1', u'行业2', u'爬取的URL', u'阶段和投资信息', u'管理团队1', u'职位1', u'管理团队',
+    u'所在地', u'公司网址', u'扩展信息'
 ]}
 
 sqls = {'lagou':
@@ -68,9 +71,10 @@ sqls = {'lagou':
             ' from company_crawler where crawler_spider="%s" and date(create_time)="%s"',
         '36kr':
             'select company_name,product_name,introduction,trade,crawler_url,stage,management_team,location,company_url,ext_info'
-            ' from company_crawler where crawler_spider="%s" and date(create_time)="%s"'
+            ' from company_crawler where crawler_spider="%s" and date(create_time)="%s"',
 
-        }
+        'itjuzi': 'select company_name,product_name,introduction,trade,crawler_url,stage,management_team,location,company_url,ext_info'
+                  ' from company_crawler where crawler_spider="%s" and date(create_time)="%s"'}
 
 if __name__ == '__main__':
     export_to_excel().export('36kr', '2016-03-14')

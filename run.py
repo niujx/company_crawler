@@ -9,8 +9,8 @@ from scrapy.utils.project import get_project_settings
 def start_crawler():
     print 'start crawler'
     process = CrawlerProcess(get_project_settings())
-    #process.crawl(Lagou)
-    #process.crawl(N36kr)
+    process.crawl(Lagou)
+    process.crawl(N36kr)
     process.crawl(ITjuzi)
 
     process.start()

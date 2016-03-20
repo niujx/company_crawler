@@ -8,12 +8,13 @@ from items import LagouItem
 import os
 import re
 from db.databases import Sqlite3DB
+from scrapy import Selector
 from selenium import webdriver
 import time
 
 
 def findCompanyId(url):
-    match = re.match(r'.*?(\d+).html', url)
+    match = re.match(r'.*?(\d+).*', url)
     if match:
         return match.group(1)
 
@@ -90,6 +91,7 @@ class N36kr(scrapy.Spider):
     companys = ['intro', 'story']
     city_dict = {}
     a_b_c_dict = {}
+    sqlite3 = Sqlite3DB()
     headers = {
         'Accept': 'application/json, text/plain, */*',
         'Accept-Encoding': 'gzip, deflate, br',
@@ -105,6 +107,7 @@ class N36kr(scrapy.Spider):
         browser = webdriver.Firefox()
         browser.get('http://36kr.com/')
         browser.find_element_by_link_text('登录/注册').click()
+        time.sleep(3)
         browser.find_element_by_name('username').send_keys('qianglin@k2vc.com')
         browser.find_element_by_name('password').send_keys('0322zhang')
         browser.find_element_by_xpath('/html/body/div[1]/div[2]/div/div/form/button').click()
@@ -123,6 +126,9 @@ class N36kr(scrapy.Spider):
             company = all_info['company']
             financing = all_info['financing']
             founder = all_info['founder']
+            if self.sqlite3.exists('36kr', str(company['id'])):
+                continue
+
             kr36_loader = ItemLoader(item=LagouItem(), response=response)
             kr36_loader.add_value('company_id', str(company['id']))
             kr36_loader.add_value('company_name', company['fullName'])
@@ -176,20 +182,63 @@ class ITjuzi(scrapy.Spider):
     name = 'itjuzi'
     start_urls = []
     allowed_domains = ['itjuzi.com']
+    sqlite3 = Sqlite3DB()
     heades = {'Referer': 'http://itjuzi.com/company?sortby=foundtime',
               'Origin': 'http://itjuzi.com',
               'Connection': 'keep-alive',
               'Accept-Encoding': 'gzip, deflate, br',
               'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0'}
 
+    cookies = {}
+
     def start_requests(self):
-        yield scrapy.Request("http://itjuzi.com/company?sortby=foundtime&page=2",
+        browser = webdriver.Firefox()
+        browser.get('https://www.itjuzi.com/')
+        browser.find_element_by_link_text('登录').click()
+        time.sleep(3)
+        browser.find_element_by_id('create_account_email').send_keys('279806846@qq.com')
+        browser.find_element_by_id('create_account_password').send_keys('0322zhang')
+        browser.find_element_by_xpath('/html/body/div[2]/div[1]/div/div/div/div/div[2]/div/form/div[3]/button').click()
+        time.sleep(30)
+        print 'start cookie'
+        browser.close()
+        self.cookies = browser.get_cookies()
+        yield scrapy.Request("http://itjuzi.com/company?sortby=foundtime&page=1", cookies=self.cookies,
                              headers=self.heades,
                              callback=self._request_generator)
 
     def _request_generator(self, response):
-        # <a data-ci-pagination-page="2378" href="http://itjuzi.com/company?sortby=foundtime&amp;page=2378">尾页 »</a>
-        print response.body
+        count = Selector(text=response.body).xpath(
+            '//div[@class="ui-pagechange for-sec-bottom"]/a[8]/@data-ci-pagination-page').extract()
+        count = int(count[0])
+        print count
+        for i in xrange(1, count):
+            url = 'http://itjuzi.com/company?sortby=foundtime&page=' + str(i)
+            yield scrapy.Request(url=url, cookies=self.cookies, callback=self.parse)
 
     def parse(self, response):
-        pass
+
+        urls = Selector(text=response.body).xpath('//i[@class="cell pic"]/a/@href').extract()
+        for url in urls:
+            if self.sqlite3.exists('itjuzi', findCompanyId(response.url)):
+                continue
+            yield scrapy.Request(url=url, cookies=self.cookies, callback=self.pasreContext)
+
+    def pasreContext(self, response):
+        if not response.status == 200:
+            return
+        # html body div.brand-wrap h3.no-data span.sub-title
+        itjuzi_loader = ItemLoader(item=LagouItem(), response=response)
+        itjuzi_loader.add_value('company_id', findCompanyId(response.url))
+        itjuzi_loader.add_xpath('company_name', '//div[@class="des-more"]/div/span/text()')
+        itjuzi_loader.add_xpath('product_name', '//div[@class="rowhead"]//b/text()')
+        itjuzi_loader.add_xpath('trade', '//div[@class="tagset dbi c-gray-aset"]/a/span/text()')
+        itjuzi_loader.add_xpath('location', '//span[@class="loca c-gray-aset"]//text()')
+        itjuzi_loader.add_xpath('stage', '//span[@class="round"]/a/text()')
+        itjuzi_loader.add_xpath('management_team', '//ul[@class="list-prodcase limited-itemnum"]//p/text()')
+        itjuzi_loader.add_xpath('introduction', '//div[@class="des"]/text()')
+        itjuzi_loader.add_xpath('company_url', '//a[@class="weblink"]/@href')
+        itjuzi_loader.add_xpath('ext_info', '//div[@class="block block-v"]/span/text()')
+        itjuzi_loader.add_value('crawler_url', response.url)
+        itjuzi_loader.add_value('crawler_spider', 'itjuzi')
+        return itjuzi_loader.load_item()
