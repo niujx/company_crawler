@@ -10,8 +10,8 @@ def start_crawler():
     print 'start crawler'
     process = CrawlerProcess(get_project_settings())
     process.crawl(Lagou)
-    process.crawl(N36kr)
-    process.crawl(ITjuzi)
+    #process.crawl(N36kr)
+    #process.crawl(ITjuzi)
 
     process.start()
 if __name__ == '__main__':

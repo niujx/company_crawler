@@ -19,27 +19,55 @@ def findCompanyId(url):
         return match.group(1)
 
 
+# 1 初创型
+# 2 成长型
+# 3 成熟型
+# 4 已上市
+# 1 2 3 4  状态
+# 24 25 33 27 29 45 31 28 47 行业了 领域
+# 2 3 214 212 6 251 79 184 297 129 197 80 4 5 167 149 111 128 148 43 215 84 217 229 98 87 44 8 281 7 234 57 248 230 223 272 70 19 101 156 81 153 314 132
+
 class Lagou(scrapy.Spider):
     name = "lagou"
     allowed_domains = ['www.lagou.com']
     start_urls = [
     ]
     sqlite3 = Sqlite3DB()
+    citys = [2, 3, 214, 212, 6, 251, 79, 184, 297, 129, 197, 80, 4, 5, 167, 149, 111, 128, 148, 43, 215, 84, 217, 229,
+             98, 87, 44, 8, 281, 7, 234, 57, 248, 230, 223, 272, 70, 19, 101, 156, 81, 153, 314, 132]
+    types = [1, 2, 3, 4]
+    channels = [24, 25, 33, 27, 29, 45, 31, 28, 47]
+    cookies = {}
 
     def start_requests(self):
-        # self.sqlite3.create_crawler_task('lagou')
-        for i in xrange(1, 21):
-            url = 'http://www.lagou.com/gongsi/2-0-0.json?first=false&havemark=0&pn=' + str(i) + '&sortField=0'
-            yield self.make_requests_from_url(url)
+        browser = webdriver.Firefox()
+        browser.get('http://www.lagou.com/')
+        time.sleep(10)
+        print 'start cookie'
+        browser.close()
+        self.cookies = browser.get_cookies()
+        for city in self.citys:
+            for type in self.types:
+                for channel in self.channels:
+                    filename = str(city) + '-' + str(type) + '-' + str(channel)
+                    print filename
+                    for i in xrange(1, 21):
+                        url = 'http://www.lagou.com/gongsi/' + filename + '.json?first=false&havemark=0&pn=' + str(
+                            i) + '&sortField=0'
+                        yield scrapy.Request(url=url, cookies=self.cookies, callback=self.parse)
 
     def parse(self, response):
-        datas = json.loads(response.body, encoding='utf-8')
-        for info in datas['result']:
-            company_id = info['companyId']
-            if self.sqlite3.exists('lagou', company_id):
-                continue
-            company_detail = 'http://www.lagou.com/gongsi/' + str(company_id) + '.html'
-            yield scrapy.Request(company_detail, callback=self.parse_detail)
+        try:
+            datas = json.loads(response.body, encoding='utf-8')
+            for info in datas['result']:
+                company_id = info['companyId']
+                if self.sqlite3.exists('lagou', company_id):
+                    continue
+                company_detail = 'http://www.lagou.com/gongsi/' + str(company_id) + '.html'
+                yield scrapy.Request(company_detail, cookies=self.cookies, callback=self.parse_detail)
+        except:
+            print 'error', response.url
+            print  response.body
 
     @staticmethod
     def parse_detail(response):

@@ -31,7 +31,6 @@ class export_to_excel(object):
                         ws.write(i, 4, trades[1])
                     j += 2
                 elif j == 7:
-                    print value
                     teams = re.split('\\s+', value)
                     if len(teams) > 1:
                         ws.write(i, 7, teams[0])
