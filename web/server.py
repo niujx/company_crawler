@@ -43,13 +43,6 @@ def index():
                            next=int(page) + 20)
 
 
-@app.route('/start_crawler')
-def start_crawler():
-    crawler = request.args.get('crawler')
-    CrawlerRun(crawler).start()
-    return index()
-
-
 class CrawlerRun(threading.Thread):
     def __init__(self, crawler):
         threading.Thread.__init__(self)

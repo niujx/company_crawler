@@ -157,10 +157,11 @@ class N36kr(scrapy.Spider):
 
         # https://rong.36kr.com/api/company?city=101&fincestatus=1&page=2&type=2
         for city in kr_city:
-            yield scrapy.Request(
-                url='https://rong.36kr.com/api/company?city=' + str(city) + '&fincestatus=1&page=' + str(
-                    i) + '&type=2',
-                cookies=cookies, callback=self.parse)
+            for i in xrange(1, 6):
+                yield scrapy.Request(
+                    url='https://rong.36kr.com/api/company?city=' + str(city) + '&fincestatus=1&page=' + str(
+                        i) + '&type=2',
+                    cookies=cookies, callback=self.parse)
 
     def parse(self, response):
         if not response.status == 200:
