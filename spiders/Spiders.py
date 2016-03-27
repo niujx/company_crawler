@@ -108,6 +108,17 @@ industry_mapping = {
     'OTHER': u' 其他 ',
     'LOGISTICS': u'物流',
 }
+# https://rong.36kr.com/api/company?city=101&fincephase=ANGEL&fincestatus=1&industry=E_COMMERCE&page=2&type=2
+
+kr_city = [101, 109, 21903, 21901, 21101, 22301, 102, 122, 112, 134, 113, 128, 119, 120, 124, 121, 103, 116, 108, 117,
+           118, 107, 110, 114, 106,
+           105, 130, 129, 115, 104, 127, 123, 126, 133, 131, 125, 111]
+kr_fincephase = ['CONSUMER_LIFESTYLE', 'E_COMMERCE', 'SOCIAL_NETWORK', 'INTELLIGENT_HARDWARE', 'MEDIA', 'SOFTWARE',
+                 'FINANCE', 'MEDICAL_HEALTH', 'SERVICE_INDUSTRIES'
+    , 'TRAVEL_OUTDOORS', 'PROPERTY_AND_HOME_FURNISHINGS', 'CULTURE_SPORTS_ART', 'EDUCATION_TRAINING', 'AUTO', 'OTHER',
+                 'LOGISTICS']
+
+kr_a_b_c = ['ANGEL', 'PRE_A', 'A', 'A_PLUS', 'B', 'B_PLUS', 'C', 'D', 'E', 'IPO']
 
 
 class N36kr(scrapy.Spider):
@@ -140,11 +151,16 @@ class N36kr(scrapy.Spider):
         browser.find_element_by_name('password').send_keys('0322zhang')
         browser.find_element_by_xpath('/html/body/div[1]/div[2]/div/div/form/button').click()
         time.sleep(30)
+        cookies = browser.get_cookies()
         print 'start cookie'
         browser.close()
-        for i in xrange(1, 21):
-            yield scrapy.Request(url='https://rong.36kr.com/api/company?fincestatus=1&page=' + str(i) + '&type=0',
-                                 cookies=browser.get_cookies(), callback=self.parse)
+
+        # https://rong.36kr.com/api/company?city=101&fincestatus=1&page=2&type=2
+        for city in kr_city:
+            yield scrapy.Request(
+                url='https://rong.36kr.com/api/company?city=' + str(city) + '&fincestatus=1&page=' + str(
+                    i) + '&type=2',
+                cookies=cookies, callback=self.parse)
 
     def parse(self, response):
         if not response.status == 200:

@@ -55,13 +55,13 @@ EXTENSIONS = {
     'extensions.SpiderOpenCloseLogging': 100
 }
 
-CONCURRENT_REQUESTS = 40
+CONCURRENT_REQUESTS = 60
 
 DOWNLOAD_DELAY = 0.3
 
 HTTPERROR_ALLOWED_CODES = [404]
 
-CONCURRENT_REQUESTS_PER_DOMAIN = 3
+CONCURRENT_REQUESTS_PER_DOMAIN = 6
 
 loginBy36kr = {
     'username': 'qianglin@k2vc.com',
