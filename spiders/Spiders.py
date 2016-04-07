@@ -51,7 +51,7 @@ class Lagou(scrapy.Spider):
                 for channel in self.channels:
                     filename = str(city) + '-' + str(type) + '-' + str(channel)
                     print filename
-                    for i in xrange(1, 21):
+                    for i in xrange(1, 5):
                         url = 'http://www.lagou.com/gongsi/' + filename + '.json?first=false&havemark=0&pn=' + str(
                             i) + '&sortField=0'
                         yield scrapy.Request(url=url, cookies=self.cookies, callback=self.parse)
@@ -145,7 +145,7 @@ class N36kr(scrapy.Spider):
         self._a_b_c_dict()
         browser = webdriver.Firefox()
         browser.get('http://36kr.com/')
-        browser.find_element_by_link_text('登录/注册').click()
+        browser.find_element_by_link_text('登录').click()
         time.sleep(3)
         browser.find_element_by_name('username').send_keys('qianglin@k2vc.com')
         browser.find_element_by_name('password').send_keys('0322zhang')
