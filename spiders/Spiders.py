@@ -117,7 +117,6 @@ kr_fincephase = ['CONSUMER_LIFESTYLE', 'E_COMMERCE', 'SOCIAL_NETWORK', 'INTELLIG
                  'FINANCE', 'MEDICAL_HEALTH', 'SERVICE_INDUSTRIES'
     , 'TRAVEL_OUTDOORS', 'PROPERTY_AND_HOME_FURNISHINGS', 'CULTURE_SPORTS_ART', 'EDUCATION_TRAINING', 'AUTO', 'OTHER',
                  'LOGISTICS']
-
 kr_a_b_c = ['ANGEL', 'PRE_A', 'A', 'A_PLUS', 'B', 'B_PLUS', 'C', 'D', 'E', 'IPO']
 
 
@@ -157,11 +156,13 @@ class N36kr(scrapy.Spider):
 
         # https://rong.36kr.com/api/company?city=101&fincestatus=1&page=2&type=2
         for city in kr_city:
-            for i in xrange(1, 6):
-                yield scrapy.Request(
-                    url='https://rong.36kr.com/api/company?city=' + str(city) + '&fincestatus=1&page=' + str(
-                        i) + '&type=2',
-                    cookies=cookies, callback=self.parse)
+            for f in kr_fincephase:
+                for a in kr_a_b_c:
+                    for i in xrange(1, 6):
+                        yield scrapy.Request(
+                            url='https://rong.36kr.com/api/company?city=' + str(city) + '&fincephase=' + str(a)
+                                + '&fincestatus=1&industry=' + str(f) + '&page=' + str(i) + '&type=0',
+                            cookies=cookies, callback=self.parse)
 
     def parse(self, response):
         if not response.status == 200:
