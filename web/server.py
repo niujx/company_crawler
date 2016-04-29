@@ -1,7 +1,6 @@
 from flask import Flask
 from flask import render_template, make_response
 from flask import request
-from apscheduler.schedulers.background import BackgroundScheduler
 from export import export_to_excel
 from db.databases import Sqlite3DB
 from run import start_crawler
@@ -13,14 +12,6 @@ import thread
 
 app = Flask(__name__)
 
-
-def job():
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(start_crawler, 'cron', hour='1')
-    try:
-        scheduler.start()
-    except:
-        scheduler.shutdown()
 
 
 @app.route('/test')
@@ -72,5 +63,4 @@ def download(crawler, today):
 
 
 if __name__ == '__main__':
-    job()
     app.run(host='0.0.0.0', port=8964, debug=True)

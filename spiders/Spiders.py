@@ -278,7 +278,7 @@ class ITjuzi(scrapy.Spider):
         itjuzi_loader.add_value('company_id', findCompanyId(response.url))
         itjuzi_loader.add_xpath('company_name', '//div[@class="des-more"]/div/span/text()')
         itjuzi_loader.add_xpath('product_name', '//div[@class="rowhead"]//b/text()')
-        itjuzi_loader.add_xpath('trade', '//div[@class="tagset dbi c-gray-aset"]/a/span/text()')
+        itjuzi_loader.add_xpath('trade', '//div[@class="info-line"]/span[1]/a[1]/text()')
         itjuzi_loader.add_xpath('location', '//span[@class="loca c-gray-aset"]//text()')
         itjuzi_loader.add_xpath('stage', '//span[@class="round"]/a/text()')
         itjuzi_loader.add_xpath('management_team', '//ul[@class="list-prodcase limited-itemnum"]//p/text()')
